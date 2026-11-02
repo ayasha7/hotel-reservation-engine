@@ -4,16 +4,18 @@ package service;
 import model.Room;
 import exception.RoomNotFoundException;
 import exception.RoomAlreadyBookedException;
+import persistence.FileManager;
+
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class HotelService {
 
-    // M3: Room registry
+    // Load previously saved rooms when the hotel starts
     private final ConcurrentHashMap<Integer, Room> rooms =
-            new ConcurrentHashMap<>();
+            FileManager.loadRooms();
 
-    // M3: Add a room (prevent duplicate room numbers)
+    // Add a new room
     public void addRoom(Room room) {
 
         Room existingRoom = rooms.putIfAbsent(
@@ -28,28 +30,33 @@ public class HotelService {
             System.out.println(
                     "Room " + room.getRoomNumber() + " added successfully!"
             );
+
+            FileManager.saveRooms(rooms);
         }
     }
 
-    // M3: Find a room using room number
+    // Find a room using its room number
     public Room findRoom(int roomNumber) {
         return rooms.get(roomNumber);
     }
 
-    // M3: Display all registered rooms
+    // Display all rooms
     public void displayAllRooms() {
 
         for (Map.Entry<Integer, Room> entry : rooms.entrySet()) {
 
+            Room room = entry.getValue();
+
             System.out.println(
                     "Room Number: " + entry.getKey()
-                            + " | Room Type: " + entry.getValue().getClass().getSimpleName()
-                            + " | Price: ₹" + entry.getValue().getBasePrice()
+                            + " | Room Type: " + room.getClass().getSimpleName()
+                            + " | Price: ₹" + room.getBasePrice()
+                            + " | Booked: " + room.isBooked()
             );
         }
     }
 
-    // M4: Check room availability
+    // Check whether a room is available
     public boolean isRoomAvailable(int roomNumber) {
 
         Room room = findRoom(roomNumber);
@@ -61,33 +68,7 @@ public class HotelService {
         return !room.isBooked();
     }
 
-    // M4: Book a room
-//    public void bookRoom(int roomNumber, int nights) {
-//
-//        Room room = findRoom(roomNumber);
-//
-//        if (room == null) {
-//            System.out.println("Room does not exist!");
-//            return;
-//        }
-//
-//        if (room.isBooked()) {
-//            System.out.println("Room is already booked!");
-//            return;
-//        }
-//
-//        double price = room.calculatePrice(nights);
-//
-//        room.setBooked(true);
-//
-//        System.out.println("Booking successful!");
-//        System.out.println("Room Number: " + roomNumber);
-//        System.out.println("Room Type: " + room.getClass().getSimpleName());
-//        System.out.println("Number of Nights: " + nights);
-//        System.out.println("Total Price: ₹" + price);
-//    }
-
-    // M5: Book a room with exception handling
+    // Book a room
     public void bookRoom(int roomNumber, int nights) {
 
         Room room = findRoom(roomNumber);
@@ -114,34 +95,18 @@ public class HotelService {
 
         room.setBooked(true);
 
+        FileManager.saveRooms(rooms);
+
         System.out.println("Booking successful!");
         System.out.println("Room Number: " + roomNumber);
-        System.out.println("Room Type: " + room.getClass().getSimpleName());
+        System.out.println(
+                "Room Type: " + room.getClass().getSimpleName()
+        );
         System.out.println("Number of Nights: " + nights);
         System.out.println("Total Price: ₹" + price);
     }
 
-    // M4: Checkout a room
-//    public void checkoutRoom(int roomNumber) {
-//
-//        Room room = findRoom(roomNumber);
-//
-//        if (room == null) {
-//            System.out.println("Room does not exist!");
-//            return;
-//        }
-//
-//        if (!room.isBooked()) {
-//            System.out.println("Room is not currently booked!");
-//            return;
-//        }
-//
-//        room.setBooked(false);
-//
-//        System.out.println("Checkout successful!");
-//        System.out.println("Room " + roomNumber + " is now available.");
-
-    // M5: Checkout a room with exception handling
+    // Checkout a room
     public void checkoutRoom(int roomNumber) {
 
         Room room = findRoom(roomNumber);
@@ -160,8 +125,11 @@ public class HotelService {
 
         room.setBooked(false);
 
-        System.out.println("Checkout successful!");
-        System.out.println("Room " + roomNumber + " is now available.");
+        FileManager.saveRooms(rooms);
 
+        System.out.println("Checkout successful!");
+        System.out.println(
+                "Room " + roomNumber + " is now available."
+        );
     }
 }
