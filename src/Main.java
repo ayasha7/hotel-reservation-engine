@@ -65,6 +65,8 @@
 
 import model.*;
 import service.HotelService;
+import exception.RoomNotFoundException;
+import exception.RoomAlreadyBookedException;
 
 public class Main {
 
@@ -92,11 +94,16 @@ public class Main {
 
         hotel.bookRoom(201, 5);
 
+
         // Try booking the same room again
         System.out.println("\n=== Trying to Book Room 201 Again ===");
 
-        hotel.bookRoom(201, 3);
-
+        try {
+            hotel.bookRoom(201, 3);
+        }
+        catch (RoomAlreadyBookedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
         // Checkout
         System.out.println("\n=== Checking Out Room 201 ===");
 
@@ -107,17 +114,60 @@ public class Main {
 
         System.out.println("Room 201: " + hotel.isRoomAvailable(201));
 
-        // Test 1: Booking a room that doesn't exist
+        // Test 1: Room does not exist
         System.out.println("\n=== Testing Invalid Room ===");
-        hotel.bookRoom(999, 2);
 
-        // Test 2: Checking out an available room
-        System.out.println("\n=== Testing Invalid Checkout ===");
-        hotel.checkoutRoom(101);
+        try {
+            hotel.bookRoom(999, 2);
+        }
+        catch (RoomNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
 
-        // Test 3: Adding a duplicate room
-        System.out.println("\n=== Testing Duplicate Room ===");
-        hotel.addRoom(new StandardRoom(101));
+
+// Test 2: Room is already booked
+        System.out.println("\n=== Testing Already Booked Room ===");
+
+        hotel.bookRoom(201, 2); // Book it once
+
+        try {
+            hotel.bookRoom(201, 3); // Try booking again
+        }
+        catch (RoomAlreadyBookedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+
+// Test 3: Invalid number of nights
+        System.out.println("\n=== Testing Invalid Nights ===");
+
+        try {
+            hotel.bookRoom(101, 0);
+        }
+        catch (IllegalArgumentException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+        // Test 4: Checkout a room that doesn't exist
+        System.out.println("\n=== Testing Invalid Checkout Room ===");
+
+        try {
+            hotel.checkoutRoom(999);
+        }
+        catch (RoomNotFoundException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+
+// Test 5: Checkout a room that isn't booked
+        System.out.println("\n=== Testing Checkout of Available Room ===");
+
+        try {
+            hotel.checkoutRoom(101);
+        }
+        catch (IllegalStateException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
 

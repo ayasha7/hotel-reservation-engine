@@ -2,6 +2,8 @@
 package service;
 
 import model.Room;
+import exception.RoomNotFoundException;
+import exception.RoomAlreadyBookedException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -60,18 +62,52 @@ public class HotelService {
     }
 
     // M4: Book a room
+//    public void bookRoom(int roomNumber, int nights) {
+//
+//        Room room = findRoom(roomNumber);
+//
+//        if (room == null) {
+//            System.out.println("Room does not exist!");
+//            return;
+//        }
+//
+//        if (room.isBooked()) {
+//            System.out.println("Room is already booked!");
+//            return;
+//        }
+//
+//        double price = room.calculatePrice(nights);
+//
+//        room.setBooked(true);
+//
+//        System.out.println("Booking successful!");
+//        System.out.println("Room Number: " + roomNumber);
+//        System.out.println("Room Type: " + room.getClass().getSimpleName());
+//        System.out.println("Number of Nights: " + nights);
+//        System.out.println("Total Price: ₹" + price);
+//    }
+
+    // M5: Book a room with exception handling
     public void bookRoom(int roomNumber, int nights) {
 
         Room room = findRoom(roomNumber);
 
         if (room == null) {
-            System.out.println("Room does not exist!");
-            return;
+            throw new RoomNotFoundException(
+                    "Room " + roomNumber + " does not exist!"
+            );
         }
 
         if (room.isBooked()) {
-            System.out.println("Room is already booked!");
-            return;
+            throw new RoomAlreadyBookedException(
+                    "Room " + roomNumber + " is already booked!"
+            );
+        }
+
+        if (nights <= 0) {
+            throw new IllegalArgumentException(
+                    "Number of nights must be greater than zero!"
+            );
         }
 
         double price = room.calculatePrice(nights);
@@ -86,23 +122,46 @@ public class HotelService {
     }
 
     // M4: Checkout a room
+//    public void checkoutRoom(int roomNumber) {
+//
+//        Room room = findRoom(roomNumber);
+//
+//        if (room == null) {
+//            System.out.println("Room does not exist!");
+//            return;
+//        }
+//
+//        if (!room.isBooked()) {
+//            System.out.println("Room is not currently booked!");
+//            return;
+//        }
+//
+//        room.setBooked(false);
+//
+//        System.out.println("Checkout successful!");
+//        System.out.println("Room " + roomNumber + " is now available.");
+
+    // M5: Checkout a room with exception handling
     public void checkoutRoom(int roomNumber) {
 
         Room room = findRoom(roomNumber);
 
         if (room == null) {
-            System.out.println("Room does not exist!");
-            return;
+            throw new RoomNotFoundException(
+                    "Room " + roomNumber + " does not exist!"
+            );
         }
 
         if (!room.isBooked()) {
-            System.out.println("Room is not currently booked!");
-            return;
+            throw new IllegalStateException(
+                    "Room " + roomNumber + " is not currently booked!"
+            );
         }
 
         room.setBooked(false);
 
         System.out.println("Checkout successful!");
         System.out.println("Room " + roomNumber + " is now available.");
+
     }
 }
