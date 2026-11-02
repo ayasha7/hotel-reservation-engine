@@ -2,15 +2,26 @@ import model.*;
 
 public class Main {
     public static void main(String[] args) {
-        Room r1 = new StandardRoom(101);
-        Room r2 = new DeluxeRoom(201);
-        Room r3 = new SuiteRoom(301);
 
-        Room[] rooms = { r1, r2, r3 };
+        Room standardRoom = new StandardRoom(101);
+        Room deluxeRoom = new DeluxeRoom(201);
+        Room suiteRoom = new SuiteRoom(301);
 
-        for (Room room : rooms) {
-            System.out.println("Room " + room.getRoomNumber()
-                    + " | 5 nights = " + room.calculatePrice(5));
-        }
+        System.out.println("=== Hotel Room Pricing ===");
+
+        System.out.println(
+                "Standard Room 101 | 5 nights = ₹"
+                        + standardRoom.calculatePrice(5)
+        );
+
+        System.out.println(
+                "Deluxe Room 201 | 5 nights = ₹"
+                        + deluxeRoom.calculatePrice(5)
+        );
+
+        System.out.println(
+                "Suite Room 301 | 5 nights = ₹"
+                        + suiteRoom.calculatePrice(5)
+        );
     }
 }
