@@ -84,6 +84,13 @@ public class HotelService {
                     "Room " + roomNumber + " is already booked!"
             );
         }
+        // Artificial delay to demonstrate race condition
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(e);
+        }
 
         if (nights <= 0) {
             throw new IllegalArgumentException(

@@ -1,4 +1,3 @@
 101,StandardRoom,false
 201,DeluxeRoom,false
 301,SuiteRoom,false
-
